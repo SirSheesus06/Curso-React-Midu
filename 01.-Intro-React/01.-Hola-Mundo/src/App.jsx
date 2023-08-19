@@ -8,13 +8,13 @@ export default function App () {
             <TwitterFollowCard 
                 name={'Juanma Vivas'}
                 userName={'Sheesus3'}
-                isFollowing
+                initialIsFollowing={true}
                 >
             </TwitterFollowCard>
             <TwitterFollowCard 
-                name={'Juanma Vivas'}
-                userName={'Sheesus3'}
-                isFollowing={false}
+                name={'Goncy.js'}
+                userName={'goncy'}
+                initialIsFollowing={false}
                 >
             </TwitterFollowCard>
         </section>
