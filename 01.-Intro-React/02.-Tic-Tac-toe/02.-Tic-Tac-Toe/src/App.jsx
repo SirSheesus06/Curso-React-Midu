@@ -23,6 +23,7 @@ const Square = ({ children, isSelected, updateBoard, index}) => {
 function App() {
 
   // Creo el tablero que renderizara el juego
+  // Tendra 9 cuadrados creados 
   const [board, setBoard] = useState(Array(9).fill(null))
 
   const [turn, setTurn] = useState(TURNS.X)
