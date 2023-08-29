@@ -9,6 +9,18 @@ const TURNS = {
   O: 'O'
 }
 
+// Creamos un array que contenga las combinaciones posibles para ganar
+const WINNER_COMBOS = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6]
+]
+
 // Creo el cuadrado donde se va a mostrar 'O' o 'X'
 const Square = ({ children, isSelected, updateBoard, index}) => {
 
@@ -16,6 +28,7 @@ const Square = ({ children, isSelected, updateBoard, index}) => {
 
   const handleClick = () => {
     updateBoard(index)
+
   }
   return (
     // Cuando el usuario hace click llama a handleClik que a su vez
@@ -37,13 +50,65 @@ function App() {
   // LE asigno por defecto que inicie en 'X'
   const [turn, setTurn] = useState(TURNS.X)
 
+  // Encontar el ganador
+  // Si no hay ganador, null, por eso como estado inicial
+  const [winner, setWinner] = useState(null)
+
+
   const updateBoard = (index) => {
-    // Primero hay que comprobar que turno es el actual y pasarlo al contrario
+    // No actualizamos si el board ya tiene algo
+    if (board[index] || winner) return 
+
+    // IMPORTANTE!! Siempre se debe generar un nuevo array
+    // LOS ESTADOS SIEMPRE HAY QUE TRATARLOS COMO INMUTABLES
+    // Si se modifica un dato, SIEMPRE hay que pasarle un array, objeto, etc nuevo
+    // Para no tener problemas de renderizado
+
+    // Entonces en cada click se genera un nuevo board
+    const newBoard = [...board]
+
+    // A ese indice del nuevo board se le asigna el valor del turno actual
+    newBoard[index] = turn // Puede ser 'X' u 'O'
+    
+    // Y luego actualizamos el board con el metodo del useState correspondiente
+    setBoard(newBoard)
+
+    // Comprobar que turno es el actual y pasarlo al contrario
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X
     // Con esto hacemos que se elija el turno a jugar
+    
     // Y se lo pasamos a setTurn para que actualize el estado
     setTurn(newTurn)
 
+    // Luego vamos a revisar si hay un ganador
+    const newWinner = checkWinner(newBoard)
+    if (newWinner) {
+      setWinner(newWinner)
+      alert(`Ha ganado ${newWinner}`)
+    }
+
+  }
+
+  // Comprobar si existe la combinacion ganadora
+  const checkWinner = (boardToCheck) => {
+    // Creamos un loop que recorra las posiciones de boardToCheck
+    // Luego recupera los 3 primeras posiciones de cada turno
+    // Si la primera y la segunda son iguales, y la primera y la tercera tambien
+    // Devuelve la primera como ganadora
+    for ( const combo of WINNER_COMBOS) {
+      const [ a, b, c] = combo
+      if (
+            boardToCheck[a] && // Si es 'X' u 'O'
+            boardToCheck[a] === boardToCheck[b] && 
+            boardToCheck[a] === boardToCheck[c]
+      ) 
+      {
+        return boardToCheck[a] // Devuelve 'X' u 'O'
+      }
+      
+    }
+    // Si no hay ganador debe devolver null
+    return null
   }
 
   return (
