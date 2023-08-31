@@ -1,43 +1,12 @@
 
 import { useState } from 'react'
+import confetti from 'canvas-confetti'
+import { Square } from './components/Square'
+import { TURNS } from './constants'
+import { checkWinnerFrom, checkEndGame } from './logic/board'
+import { WinnerModal } from './components/WinnerModal'
 import './App.css'
 
-
-// Creamos los turnos posibles
-const TURNS = {
-  X: 'X',
-  O: 'O'
-}
-
-// Creamos un array que contenga las combinaciones posibles para ganar
-const WINNER_COMBOS = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6]
-]
-
-// Creo el cuadrado donde se va a mostrar 'O' o 'X'
-const Square = ({ children, isSelected, updateBoard, index}) => {
-
-  const className = `square ${isSelected ? 'is-selected' : ''}`
-
-  const handleClick = () => {
-    updateBoard(index)
-
-  }
-  return (
-    // Cuando el usuario hace click llama a handleClik que a su vez
-    // LLama a updateBoard para actualizar el estado
-    <div onClick={handleClick} className={className}>
-      {children}
-    </div>
-  )
-}
 
 function App() {
 
@@ -54,6 +23,13 @@ function App() {
   // Si no hay ganador, null, por eso como estado inicial
   const [winner, setWinner] = useState(null)
 
+  // Restear el Juego mediante una funcion
+  // Hay que setear de nuevo los estados al valor inicial
+  const resetGame = () => {
+    setBoard(Array(9).fill(null))
+    setTurn(TURNS.X)
+    setWinner(null)
+  }
 
   const updateBoard = (index) => {
     // No actualizamos si el board ya tiene algo
@@ -81,45 +57,26 @@ function App() {
     setTurn(newTurn)
 
     // Luego vamos a revisar si hay un ganador
-    const newWinner = checkWinner(newBoard)
+    const newWinner = checkWinnerFrom(newBoard)
     if (newWinner) {
+      confetti()
       setWinner(newWinner)
-      alert(`Ha ganado ${newWinner}`)
+    } else if (checkEndGame(newBoard)) {
+      setWinner(false)
     }
 
-  }
-
-  // Comprobar si existe la combinacion ganadora
-  const checkWinner = (boardToCheck) => {
-    // Creamos un loop que recorra las posiciones de boardToCheck
-    // Luego recupera los 3 primeras posiciones de cada turno
-    // Si la primera y la segunda son iguales, y la primera y la tercera tambien
-    // Devuelve la primera como ganadora
-    for ( const combo of WINNER_COMBOS) {
-      const [ a, b, c] = combo
-      if (
-            boardToCheck[a] && // Si es 'X' u 'O'
-            boardToCheck[a] === boardToCheck[b] && 
-            boardToCheck[a] === boardToCheck[c]
-      ) 
-      {
-        return boardToCheck[a] // Devuelve 'X' u 'O'
-      }
-      
-    }
-    // Si no hay ganador debe devolver null
-    return null
   }
 
   return (
 
     <main className='board'>
       <h1>Tic-Tac-Toe</h1>
+      <button onClick={resetGame}>Resetear Juego</button>
       <section className='game'>
         {
           // Se renderiza el tablero, que dentro va a tener el componente
           // <Square />, repetido 9 veces
-          board.map((_, index) => {
+          board.map((square, index) => {
             return (
               <Square 
                 key={index} 
@@ -130,7 +87,7 @@ function App() {
                 // Solo cuando se hace click en un componente <Square />
                 updateBoard={updateBoard}
               >
-                {board[index]}
+                {square}
               </Square>
             )
           })
@@ -143,6 +100,7 @@ function App() {
         <Square isSelected={turn === TURNS.X}>{TURNS.X}</Square>
         <Square isSelected={turn === TURNS.O}>{TURNS.O}</Square>
       </section>
+      <WinnerModal resetGame={resetGame} winner={winner} />
     </main>
   )
 }
