@@ -10,14 +10,23 @@ import './App.css'
 
 function App() {
 
-  // Creo el tablero que renderizara el juego
-  // Tendra 9 cuadrados creados decretados como un array
-  // Al cual le indico la cantidad que quiero con el metodo .fill()
-  const [board, setBoard] = useState(Array(9).fill(null))
+  // Inicializo el estado inicial con una funcion
+  // Que si tiene el board en local storage devuelve
+  // Sino por defecto inicia un board de 9 lugares vacios
+  const [board, setBoard] = useState(() => {
+    const boardFromStorage = window.localStorage.getItem('board')
+    return boardFromStorage 
+            ? JSON.parse(boardFromStorage) 
+            : Array(9).fill(null)
+  })
 
-  // Creo el estado inicial de los Turnos, al cual
-  // LE asigno por defecto que inicie en 'X'
-  const [turn, setTurn] = useState(TURNS.X)
+  // Creo el estado inicial de los Turnos,
+  // Y primero consulta en local storage si este tiene un TURN
+  // Sino, inicia por defecto el turno 'X'
+  const [turn, setTurn] = useState(() => {
+    const turnFromStorage = window.localStorage.getItem('turn') // Ya es String
+    return turnFromStorage ?? TURNS.X 
+  })
 
   // Encontar el ganador
   // Si no hay ganador, null, por eso como estado inicial
@@ -29,6 +38,10 @@ function App() {
     setBoard(Array(9).fill(null))
     setTurn(TURNS.X)
     setWinner(null)
+
+    // Tambien resetear local storage
+    window.localStorage.removeItem('board')
+    window.localStorage.removeItem('turn')
   }
 
   const updateBoard = (index) => {
@@ -55,6 +68,10 @@ function App() {
     
     // Y se lo pasamos a setTurn para que actualize el estado
     setTurn(newTurn)
+
+    // Guardar partida en LocalStorage para retomar en caso de recargar pagina
+    window.localStorage.setItem('board', JSON.stringify(newBoard))
+    window.localStorage.setItem('turn', newTurn)
 
     // Luego vamos a revisar si hay un ganador
     const newWinner = checkWinnerFrom(newBoard)
