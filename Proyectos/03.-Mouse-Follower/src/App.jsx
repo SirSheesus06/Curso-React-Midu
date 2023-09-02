@@ -17,11 +17,24 @@ function App() {
       setPosition({ x: clientX, y: clientY})
 
     }
-      if (enabled) {
+    if (enabled) {
 
-        window.addEventListener('pointermove', handleMove)
-      }
+      window.addEventListener('pointermove', handleMove)
+    }
+
+    // Este return se utiliza para limpiar o desuscribir un evento
+    // Al que hemos adhrido con addEventListener
+    // Esto hace que inicie de 0 una vez que se desmonte el 
+    // Componente o cambien las dependencias
+    return () => { // A esta funcion se la llama clean up method
+      window.removeEventListener('pointermove', handleMove)
+    }
+
   }, [enabled])
+
+  // [] Se ejecuta solo cuando se monta el componente
+  // [enabled] Se ejecuta siempre que cambie esa dependencia
+  // undefined(sin nada) Se ejecuta siempre que se renderiza
 
   return (
     <main>
