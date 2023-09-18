@@ -5,11 +5,10 @@ const CAT_ENDPOINT_RANDOM_FACT = 'https://catfact.ninja/fact'
 const CAT_IMAGE_PREFIX_URL = 'https://cataas.com'
 
 export function App () {
-
   // Estado donde se guaran los facts
   const [fact, setFact] = useState()
 
-  // Estados donde se guardan las imagenes 
+  // Estados donde se guardan las imagenes
   const [imageUrl, setImageUrl] = useState()
 
   // Recuperar las palabras al cargar la pagina
@@ -17,7 +16,7 @@ export function App () {
     // Fetching de datos con la 1ra API
     fetch(CAT_ENDPOINT_RANDOM_FACT)
       .then(res => res.json()) // Transformar a JSON
-      .then(data => { 
+      .then(data => {
         const { fact } = data // Obtener de data el fact y almacenarlo
         setFact(fact) // Actualizar el estado fact
       })
