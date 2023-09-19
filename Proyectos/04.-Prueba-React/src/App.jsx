@@ -1,26 +1,13 @@
 import { useEffect, useState } from 'react'
+import { getRandomFact } from './services/facts.js'
 import '../style.css'
 
-const CAT_ENDPOINT_RANDOM_FACT = 'https://catfact.ninja/fact'
+// const CAT_ENDPOINT_RANDOM_FACT = 'https://catfact.ninja/fact'
 const CAT_IMAGE_PREFIX_URL = 'https://cataas.com'
 
-export function App () {
-  // Estado donde se guaran los facts
-  const [fact, setFact] = useState()
-
+function useCatImage ({ fact }) {
   // Estados donde se guardan las imagenes
   const [imageUrl, setImageUrl] = useState()
-
-  // Recuperar las palabras al cargar la pagina
-  useEffect(() => {
-    // Fetching de datos con la 1ra API
-    fetch(CAT_ENDPOINT_RANDOM_FACT)
-      .then(res => res.json()) // Transformar a JSON
-      .then(data => {
-        const { fact } = data // Obtener de data el fact y almacenarlo
-        setFact(fact) // Actualizar el estado fact
-      })
-  }, [])
 
   // Recuperar la imagen una vez que tenemos facts
   useEffect(() => {
@@ -39,9 +26,30 @@ export function App () {
       })
   }, [fact])
 
+  return { imageUrl }
+}
+
+export function App () {
+  // Estado donde se guaran los facts
+  const [fact, setFact] = useState()
+  // Se crea imageUrl que contendra el custom hook con fact como parametro
+  const { imageUrl } = useCatImage({ fact })
+
+  // Recuperar las palabras al cargar la pagina
+  useEffect(() => {
+    // Obtengo el fact nuevo, luego lo paso por funcion a setFact y actualiza el estado
+    getRandomFact().then(newFact => setFact(newFact))
+  }, [])
+
+  const handleClick = async () => {
+    const newFact = await getRandomFact()
+    setFact(newFact)
+  }
+
   return (
     <main className='main-container'>
       <h1>App de Gatitos</h1>
+      <button onClick={handleClick}>Recargar Fact</button>
       {fact && <p>{fact}</p>}
       {imageUrl && <img src={`${CAT_IMAGE_PREFIX_URL}${imageUrl}`} alt='cats image' />}
     </main>
