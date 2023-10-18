@@ -39,7 +39,7 @@ function App() {
             </ul>
           )
          : (
-          <p>Don´t have results</p>
+          <p>Dont have results</p>
         )
         }
       </main>
